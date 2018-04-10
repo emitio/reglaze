@@ -1,6 +1,6 @@
 {
   "name": "reglaze",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "an alternative for redux react-redux redux-observable and reselect using a few lines of rxjs",
   "main": "index.jsx",
   "scripts": {
