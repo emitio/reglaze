@@ -2,7 +2,7 @@
   "name": "reglaze",
   "version": "1.0.0-alpha.1",
   "description": "an alternative for redux react-redux redux-observable and reselect using a few lines of rxjs",
-  "main": "index.js",
+  "main": "index.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,8 +23,6 @@
   },
   "homepage": "https://github.com/emitio/reglaze#readme",
   "dependencies": {
-    "babel-plugin-transform-es2015-spread": "^6.22.0",
-    "babel-preset-env": "^1.6.1",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
     "rxjs": "^6.0.0-beta.4"
