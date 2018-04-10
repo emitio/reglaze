@@ -21,5 +21,12 @@
   "bugs": {
     "url": "https://github.com/emitio/reglaze/issues"
   },
-  "homepage": "https://github.com/emitio/reglaze#readme"
+  "homepage": "https://github.com/emitio/reglaze#readme",
+  "dependencies": {
+    "babel-plugin-transform-es2015-spread": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
+    "rxjs": "^6.0.0-beta.4"
+  }
 }
