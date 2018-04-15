@@ -4,7 +4,7 @@ import { flatMap, map, publishBehavior, refCount } from "rxjs/operators";
 
 // createReglaze returns an object {state$, dispatch}
 // reglazer is the user provided function that is similar to the redux reduce function
-const createReglaze = (reglazer, init, action$$) => {
+const createReglaze = (reglazer: any, init: any, action$$: Subject<any>) => {
   const state$ = new Observable(observer => {
     let current = init;
     const action$ = action$$.pipe(flatMap(a$ => a$));
@@ -33,8 +33,8 @@ const createReglaze = (reglazer, init, action$$) => {
 
 const createConnect = Consumer => {
   return (WrappedComponent, mapState$ToProps, mapDispatchToProps) => {
-    class Connect extends React.Component {
-      constructor(props) {
+    class Connect extends React.Component<any, any> {
+      constructor(props: any) {
         super(props);
         const { dispatch } = this.props.store;
         this.state = {};

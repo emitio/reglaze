@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { createContext } from "../../../index.jsx";
+import { createContext } from "../../../dist/index";
 import { empty, of } from "rxjs";
 import { delay, filter, map, takeUntil } from "rxjs/operators";
 
