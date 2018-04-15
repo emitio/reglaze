@@ -6,7 +6,12 @@ let contexts: any = {};
 
 // createReglaze returns an object {state$, dispatch}
 // reglazer is the user provided function that is similar to the redux reduce function
-const createReglaze = (reglazer: any, init: any, action$$: Subject<any>) => {
+const createReglaze = (
+  reglazer: any,
+  init: any,
+  action$$: Subject<any>,
+  actionInit$: Observable<any>
+) => {
   const state$ = new Observable(observer => {
     let current = init;
     const action$ = action$$.pipe(flatMap(a$ => a$));
@@ -21,6 +26,7 @@ const createReglaze = (reglazer: any, init: any, action$$: Subject<any>) => {
         observer.next(state);
         action$$.next(action$);
       });
+    action$$.next(actionInit$);
     return () => {
       subscription.unsubscribe();
     };
@@ -103,10 +109,15 @@ export const connect = (
 // createContext accepts a reglazer function to handle state transitions and specify side-effects
 // and an initial state. createContext returns a Provider and Consumer context. The Consumer context
 // provides access to the reglaze prop which is an object of state$ and dispatch.
-export const createContext = (symbol, reglazer, init) => {
-  const action$$ = new Subject();
+export const createContext = (
+  symbol: any,
+  reglazer: any,
+  init: any,
+  action$: Observable<any>
+) => {
+  const action$$: Subject<Observable<any>> = new Subject();
   const { Provider, Consumer } = React.createContext({});
-  const { state$, dispatch } = createReglaze(reglazer, init, action$$);
+  const { state$, dispatch } = createReglaze(reglazer, init, action$$, action$);
   const reglaze = {
     state$,
     dispatch

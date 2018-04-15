@@ -39,9 +39,14 @@ const reglazer = (state, action, state$, action$) => {
 // TODO figure out how to provide a global "connect" function that can find the appropriate
 // Consumer at runtime to grab the context from
 const mainCtx = Symbol("mainCtx");
-const { Provider } = createContext(mainCtx, reglazer, {
-  username: null
-});
+const { Provider } = createContext(
+  mainCtx,
+  reglazer,
+  {
+    username: null
+  },
+  of({ kind: "LoginRequest", username: "supershabam" })
+);
 
 const App = props => {
   const { login, logout, username } = props;

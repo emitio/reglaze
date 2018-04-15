@@ -24,7 +24,7 @@ var operators_1 = require("rxjs/operators");
 var contexts = {};
 // createReglaze returns an object {state$, dispatch}
 // reglazer is the user provided function that is similar to the redux reduce function
-var createReglaze = function (reglazer, init, action$$) {
+var createReglaze = function (reglazer, init, action$$, actionInit$) {
     var state$ = new rxjs_1.Observable(function (observer) {
         var current = init;
         var action$ = action$$.pipe(operators_1.flatMap(function (a$) { return a$; }));
@@ -38,6 +38,8 @@ var createReglaze = function (reglazer, init, action$$) {
             observer.next(state);
             action$$.next(action$);
         });
+        console.log("observer connected, sending init", actionInit$);
+        action$$.next(actionInit$);
         return function () {
             subscription.unsubscribe();
         };
@@ -111,10 +113,10 @@ exports.connect = function (symbol, WrappedComponent, mapState$ToProps, mapDispa
 // createContext accepts a reglazer function to handle state transitions and specify side-effects
 // and an initial state. createContext returns a Provider and Consumer context. The Consumer context
 // provides access to the reglaze prop which is an object of state$ and dispatch.
-exports.createContext = function (symbol, reglazer, init) {
+exports.createContext = function (symbol, reglazer, init, action$) {
     var action$$ = new rxjs_1.Subject();
     var _a = React.createContext({}), Provider = _a.Provider, Consumer = _a.Consumer;
-    var _b = createReglaze(reglazer, init, action$$), state$ = _b.state$, dispatch = _b.dispatch;
+    var _b = createReglaze(reglazer, init, action$$, action$), state$ = _b.state$, dispatch = _b.dispatch;
     var reglaze = {
         state$: state$,
         dispatch: dispatch
@@ -129,3 +131,4 @@ exports.createContext = function (symbol, reglazer, init) {
     };
     return contexts[symbol];
 };
+exports.hello = "hi";
