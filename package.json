@@ -1,9 +1,9 @@
 {
   "name": "reglaze",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description":
     "an alternative for redux react-redux redux-observable and reselect using a few lines of rxjs",
-  "main": "index.jsx",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
