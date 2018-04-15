@@ -2,6 +2,8 @@ import * as React from "react";
 import { of, Observable, Subject } from "rxjs";
 import { flatMap, map, publishBehavior, refCount } from "rxjs/operators";
 
+let contexts: any = {};
+
 // createReglaze returns an object {state$, dispatch}
 // reglazer is the user provided function that is similar to the redux reduce function
 const createReglaze = (reglazer: any, init: any, action$$: Subject<any>) => {
@@ -98,7 +100,7 @@ const createConnect = Consumer => {
 // createContext accepts a reglazer function to handle state transitions and specify side-effects
 // and an initial state. createContext returns a Provider and Consumer context. The Consumer context
 // provides access to the reglaze prop which is an object of state$ and dispatch.
-export const createContext = (reglazer, init) => {
+export const createContext = (symbol, reglazer, init) => {
   const action$$ = new Subject();
   const { Provider, Consumer } = React.createContext({});
   const { state$, dispatch } = createReglaze(reglazer, init, action$$);
@@ -110,9 +112,23 @@ export const createContext = (reglazer, init) => {
   const WrappedProvider = props => {
     return <Provider value={reglaze} {...props} />;
   };
-  return {
+  contexts[symbol] = {
     connect: createConnect(Consumer),
     Provider: WrappedProvider,
     Consumer
   };
+  return contexts[symbol];
+};
+
+export const connect = (
+  symbol,
+  WrappedComponent,
+  mapState$ToProps,
+  mapDispatchToProps
+) => {
+  let ctx = contexts[symbol];
+  if (!ctx) {
+    throw new Error("context not initialized");
+  }
+  return ctx.connect(WrappedComponent, mapState$ToProps, mapDispatchToProps);
 };

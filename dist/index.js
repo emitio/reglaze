@@ -21,6 +21,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var rxjs_1 = require("rxjs");
 var operators_1 = require("rxjs/operators");
+var contexts = {};
 // createReglaze returns an object {state$, dispatch}
 // reglazer is the user provided function that is similar to the redux reduce function
 var createReglaze = function (reglazer, init, action$$) {
@@ -108,7 +109,7 @@ var createConnect = function (Consumer) {
 // createContext accepts a reglazer function to handle state transitions and specify side-effects
 // and an initial state. createContext returns a Provider and Consumer context. The Consumer context
 // provides access to the reglaze prop which is an object of state$ and dispatch.
-exports.createContext = function (reglazer, init) {
+exports.createContext = function (symbol, reglazer, init) {
     var action$$ = new rxjs_1.Subject();
     var _a = React.createContext({}), Provider = _a.Provider, Consumer = _a.Consumer;
     var _b = createReglaze(reglazer, init, action$$), state$ = _b.state$, dispatch = _b.dispatch;
@@ -120,9 +121,17 @@ exports.createContext = function (reglazer, init) {
     var WrappedProvider = function (props) {
         return React.createElement(Provider, __assign({ value: reglaze }, props));
     };
-    return {
+    contexts[symbol] = {
         connect: createConnect(Consumer),
         Provider: WrappedProvider,
         Consumer: Consumer
     };
+    return contexts[symbol];
+};
+exports.connect = function (symbol, WrappedComponent, mapState$ToProps, mapDispatchToProps) {
+    var ctx = contexts[symbol];
+    if (!ctx) {
+        throw new Error("context not initialized");
+    }
+    return ctx.connect(WrappedComponent, mapState$ToProps, mapDispatchToProps);
 };

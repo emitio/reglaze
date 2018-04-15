@@ -1,5 +1,2 @@
-export declare const createContext: (reglazer: any, init: any) => {
-    connect: (WrappedComponent: any, mapState$ToProps: any, mapDispatchToProps: any) => (props: any) => any;
-    Provider: (props: any) => any;
-    Consumer: any;
-};
+export declare const createContext: (symbol: any, reglazer: any, init: any) => any;
+export declare const connect: (symbol: any, WrappedComponent: any, mapState$ToProps: any, mapDispatchToProps: any) => any;

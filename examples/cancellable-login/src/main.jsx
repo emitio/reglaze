@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { createContext } from "../../../dist/index";
+import { connect, createContext } from "../../../dist/index";
 import { empty, of } from "rxjs";
 import { delay, filter, map, takeUntil } from "rxjs/operators";
 
@@ -38,7 +38,8 @@ const reglazer = (state, action, state$, action$) => {
 
 // TODO figure out how to provide a global "connect" function that can find the appropriate
 // Consumer at runtime to grab the context from
-const { connect, Provider, Consumer } = createContext(reglazer, {
+const mainCtx = Symbol("mainCtx");
+const { Provider } = createContext(mainCtx, reglazer, {
   username: null
 });
 
@@ -59,6 +60,7 @@ const App = props => {
 };
 
 const ConnectedApp = connect(
+  mainCtx,
   App,
   // mapState$ToProps
   {
