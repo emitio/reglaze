@@ -49,61 +49,63 @@ var createReglaze = function (reglazer, init, action$$) {
         }
     };
 };
-var createConnect = function (Consumer) {
-    return function (WrappedComponent, mapState$ToProps, mapDispatchToProps) {
-        var Connect = /** @class */ (function (_super) {
-            __extends(Connect, _super);
-            function Connect(props) {
-                var _this = _super.call(this, props) || this;
-                var dispatch = _this.props.store.dispatch;
-                _this.state = {};
-                _this.subs = [];
-                _this.mappedDispatches = Object.keys(mapDispatchToProps).reduce(function (acc, key) {
-                    var value = mapDispatchToProps[key];
-                    acc[key] = function interceptAction() {
-                        var action = value.apply(null, arguments);
-                        dispatch(action);
-                    };
-                    return acc;
-                }, {});
-                return _this;
-            }
-            Connect.prototype.componentDidMount = function () {
-                var _this = this;
-                var _loop_1 = function (key) {
-                    this_1.subs = this_1.subs.concat([
-                        mapState$ToProps[key](this_1.props.store.state$).subscribe(function (value) {
-                            _this.setState(function (prevState) {
-                                // return {...prevState, { [key]:value}}
-                                return Object.assign({}, prevState, (_a = {}, _a[key] = value, _a));
-                                var _a;
-                            });
-                        })
-                    ]);
+exports.connect = function (symbol, WrappedComponent, mapState$ToProps, mapDispatchToProps) {
+    var Connect = /** @class */ (function (_super) {
+        __extends(Connect, _super);
+        function Connect(props) {
+            var _this = _super.call(this, props) || this;
+            var dispatch = _this.props.store.dispatch;
+            _this.state = {};
+            _this.subs = [];
+            _this.mappedDispatches = Object.keys(mapDispatchToProps).reduce(function (acc, key) {
+                var value = mapDispatchToProps[key];
+                acc[key] = function interceptAction() {
+                    var action = value.apply(null, arguments);
+                    dispatch(action);
                 };
-                var this_1 = this;
-                for (var key in mapState$ToProps) {
-                    _loop_1(key);
-                }
+                return acc;
+            }, {});
+            return _this;
+        }
+        Connect.prototype.componentDidMount = function () {
+            var _this = this;
+            var _loop_1 = function (key) {
+                this_1.subs = this_1.subs.concat([
+                    mapState$ToProps[key](this_1.props.store.state$).subscribe(function (value) {
+                        _this.setState(function (prevState) {
+                            // return {...prevState, { [key]:value}}
+                            return Object.assign({}, prevState, (_a = {}, _a[key] = value, _a));
+                            var _a;
+                        });
+                    })
+                ]);
             };
-            Connect.prototype.componentWillUnmount = function () {
-                for (var _i = 0, _a = this.subs; _i < _a.length; _i++) {
-                    var sub = _a[_i];
-                    sub.unsubscribe();
-                }
-            };
-            Connect.prototype.render = function () {
-                // copy everything but "store" from the context into the wrapped component
-                // const { store, ...props } = this.props;
-                var props = Object.assign({}, this.props);
-                delete props["store"];
-                return (React.createElement(WrappedComponent, __assign({}, props, this.state, this.mappedDispatches)));
-            };
-            return Connect;
-        }(React.Component));
-        return function (props) {
-            return (React.createElement(Consumer, null, function (store) { return React.createElement(Connect, __assign({ store: store }, props)); }));
+            var this_1 = this;
+            for (var key in mapState$ToProps) {
+                _loop_1(key);
+            }
         };
+        Connect.prototype.componentWillUnmount = function () {
+            for (var _i = 0, _a = this.subs; _i < _a.length; _i++) {
+                var sub = _a[_i];
+                sub.unsubscribe();
+            }
+        };
+        Connect.prototype.render = function () {
+            // copy everything but "store" from the context into the wrapped component
+            // const { store, ...props } = this.props;
+            var props = Object.assign({}, this.props);
+            delete props["store"];
+            return (React.createElement(WrappedComponent, __assign({}, props, this.state, this.mappedDispatches)));
+        };
+        return Connect;
+    }(React.Component));
+    return function (props) {
+        if (!contexts[symbol]) {
+            throw new Error("could not find provided context by symbol=" + symbol);
+        }
+        var Consumer = contexts[symbol].Consumer;
+        return React.createElement(Consumer, null, function (store) { return React.createElement(Connect, __assign({ store: store }, props)); });
     };
 };
 // createContext accepts a reglazer function to handle state transitions and specify side-effects
@@ -122,16 +124,8 @@ exports.createContext = function (symbol, reglazer, init) {
         return React.createElement(Provider, __assign({ value: reglaze }, props));
     };
     contexts[symbol] = {
-        connect: createConnect(Consumer),
         Provider: WrappedProvider,
         Consumer: Consumer
     };
     return contexts[symbol];
-};
-exports.connect = function (symbol, WrappedComponent, mapState$ToProps, mapDispatchToProps) {
-    var ctx = contexts[symbol];
-    if (!ctx) {
-        throw new Error("context not initialized");
-    }
-    return ctx.connect(WrappedComponent, mapState$ToProps, mapDispatchToProps);
 };

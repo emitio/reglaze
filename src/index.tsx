@@ -33,67 +33,70 @@ const createReglaze = (reglazer: any, init: any, action$$: Subject<any>) => {
   };
 };
 
-const createConnect = Consumer => {
-  return (WrappedComponent, mapState$ToProps, mapDispatchToProps) => {
-    class Connect extends React.Component<any, any> {
-      constructor(props: any) {
-        super(props);
-        const { dispatch } = this.props.store;
-        this.state = {};
-        this.subs = [];
-        this.mappedDispatches = Object.keys(mapDispatchToProps).reduce(
-          (acc, key) => {
-            const value = mapDispatchToProps[key];
-            acc[key] = function interceptAction() {
-              const action = value.apply(null, arguments);
-              dispatch(action);
-            };
-            return acc;
-          },
-          {}
-        );
-      }
-      componentDidMount() {
-        for (let key in mapState$ToProps) {
-          this.subs = [
-            ...this.subs,
-            ...[
-              mapState$ToProps[key](this.props.store.state$).subscribe(
-                value => {
-                  this.setState(prevState => {
-                    // return {...prevState, { [key]:value}}
-                    return Object.assign({}, prevState, { [key]: value });
-                  });
-                }
-              )
-            ]
-          ];
-        }
-      }
-      componentWillUnmount() {
-        for (let sub of this.subs) {
-          sub.unsubscribe();
-        }
-      }
-      render() {
-        // copy everything but "store" from the context into the wrapped component
-        // const { store, ...props } = this.props;
-        let props = Object.assign({}, this.props);
-        delete props["store"];
-        return (
-          <WrappedComponent
-            {...props}
-            {...this.state}
-            {...this.mappedDispatches}
-          />
-        );
+export const connect = (
+  symbol,
+  WrappedComponent,
+  mapState$ToProps,
+  mapDispatchToProps
+) => {
+  class Connect extends React.Component<any, any> {
+    constructor(props: any) {
+      super(props);
+      const { dispatch } = this.props.store;
+      this.state = {};
+      this.subs = [];
+      this.mappedDispatches = Object.keys(mapDispatchToProps).reduce(
+        (acc, key) => {
+          const value = mapDispatchToProps[key];
+          acc[key] = function interceptAction() {
+            const action = value.apply(null, arguments);
+            dispatch(action);
+          };
+          return acc;
+        },
+        {}
+      );
+    }
+    componentDidMount() {
+      for (let key in mapState$ToProps) {
+        this.subs = [
+          ...this.subs,
+          ...[
+            mapState$ToProps[key](this.props.store.state$).subscribe(value => {
+              this.setState(prevState => {
+                // return {...prevState, { [key]:value}}
+                return Object.assign({}, prevState, { [key]: value });
+              });
+            })
+          ]
+        ];
       }
     }
-    return props => {
+    componentWillUnmount() {
+      for (let sub of this.subs) {
+        sub.unsubscribe();
+      }
+    }
+    render() {
+      // copy everything but "store" from the context into the wrapped component
+      // const { store, ...props } = this.props;
+      let props = Object.assign({}, this.props);
+      delete props["store"];
       return (
-        <Consumer>{store => <Connect store={store} {...props} />}</Consumer>
+        <WrappedComponent
+          {...props}
+          {...this.state}
+          {...this.mappedDispatches}
+        />
       );
-    };
+    }
+  }
+  return props => {
+    if (!contexts[symbol]) {
+      throw new Error(`could not find provided context by symbol=${symbol}`);
+    }
+    const { Consumer } = contexts[symbol];
+    return <Consumer>{store => <Connect store={store} {...props} />}</Consumer>;
   };
 };
 
@@ -113,22 +116,8 @@ export const createContext = (symbol, reglazer, init) => {
     return <Provider value={reglaze} {...props} />;
   };
   contexts[symbol] = {
-    connect: createConnect(Consumer),
     Provider: WrappedProvider,
     Consumer
   };
   return contexts[symbol];
-};
-
-export const connect = (
-  symbol,
-  WrappedComponent,
-  mapState$ToProps,
-  mapDispatchToProps
-) => {
-  let ctx = contexts[symbol];
-  if (!ctx) {
-    throw new Error("context not initialized");
-  }
-  return ctx.connect(WrappedComponent, mapState$ToProps, mapDispatchToProps);
 };
