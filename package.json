@@ -1,7 +1,8 @@
 {
   "name": "reglaze",
-  "version": "1.0.0-alpha.2",
-  "description": "an alternative for redux react-redux redux-observable and reselect using a few lines of rxjs",
+  "version": "1.0.0-alpha.3",
+  "description":
+    "an alternative for redux react-redux redux-observable and reselect using a few lines of rxjs",
   "main": "index.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,12 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/emitio/reglaze.git"
   },
-  "keywords": [
-    "redux",
-    "react",
-    "rxjs",
-    "reselect"
-  ],
+  "keywords": ["redux", "react", "rxjs", "reselect"],
   "author": "Ian Hansen",
   "license": "MIT",
   "bugs": {
