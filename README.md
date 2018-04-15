@@ -1,6 +1,6 @@
 # reglaze
 
-[experimental] an alternative for redux react-redux redux-observable and reselect using a few lines of rxjs
+[experimental] combines the ideas from redux, react-redux, redux-observable, and reselect into a bit of rxjs magic
 
 Video introduction: [https://youtu.be/bERGGZghr0Q](https://youtu.be/bERGGZghr0Q)
 
